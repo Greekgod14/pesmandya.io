@@ -299,6 +299,20 @@
       text-align: center;
       color: #f44336;
     }
+
+    .not-plant-card {
+      display: none;
+      background: #141005;
+      border: 1px solid #5a3e00;
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+    }
+    .not-plant-card .npc-icon { font-size: 52px; margin-bottom: 12px; }
+    .not-plant-card h3 { font-size: 20px; font-weight: 700; color: #ffc107; margin-bottom: 8px; }
+    .not-plant-card p { color: #999; font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
+    .not-plant-card ul { text-align: left; display: inline-block; color: #888; font-size: 13px; margin-bottom: 20px; }
+    .not-plant-card ul li { margin-bottom: 6px; }
   </style>
 </head>
 <body>
@@ -342,6 +356,19 @@
   <div class="result-card" id="resultCard"></div>
   <div class="error-card" id="errorCard">⚠️ Analysis failed. Please try another image.</div>
 
+  <div class="not-plant-card" id="notPlantCard">
+    <div class="npc-icon">🌿</div>
+    <h3>Not a Plant Image</h3>
+    <p>Our AI detected that this image does not show a plant, leaf, or crop.<br>Please upload a clear photo of a plant for disease analysis.</p>
+    <ul>
+      <li>✅ Close-up of a leaf (healthy or diseased)</li>
+      <li>✅ Crop field or plant stem</li>
+      <li>✅ Fruit still on the plant</li>
+      <li>❌ People, animals, food, or objects</li>
+    </ul>
+    <button class="reset-btn" onclick="resetScanner()">← Try Again with a Plant Image</button>
+  </div>
+
 </div>
 
 <script>
@@ -352,6 +379,7 @@
   const loading = document.getElementById('loading');
   const resultCard = document.getElementById('resultCard');
   const errorCard = document.getElementById('errorCard');
+  const notPlantCard = document.getElementById('notPlantCard');
 
   let selectedFile = null;
 
@@ -405,6 +433,8 @@
 
       if (data.success && data.result) {
         renderResult(data.result);
+      } else if (data.not_a_plant) {
+        notPlantCard.style.display = 'block';
       } else {
         errorCard.style.display = 'block';
       }
@@ -426,7 +456,7 @@
         <div class="status-icon">${icon}</div>
         <div>
           <div class="disease-name ${nameClass}">${r.disease}</div>
-          <div class="confidence">Confidence: ${r.confidence}% | Affected: ${r.affected_area_percent}% of leaf area</div>
+          <div class="confidence">${r.plant_type ? '🌱 ' + r.plant_type + ' · ' : ''}Confidence: ${r.confidence}% | Affected: ${r.affected_area_percent}% of leaf area</div>
         </div>
         <div class="severity-badge severity-${r.severity}">${r.severity} Severity</div>
       </div>
@@ -481,6 +511,7 @@
     previewContainer.style.display = 'none';
     resultCard.style.display = 'none';
     errorCard.style.display = 'none';
+    notPlantCard.style.display = 'none';
   }
 </script>
 

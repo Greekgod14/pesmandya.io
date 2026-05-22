@@ -34,13 +34,21 @@ async def analyze_crop(file: UploadFile = File(...)):
         image = Image.open(io.BytesIO(contents))
 
         prompt = """
-        You are an expert agricultural scientist with 20 years of experience in crop disease diagnosis.
-        Carefully analyze this crop/plant leaf image.
-        
-        Respond ONLY with a valid JSON object. No extra text, no markdown, no backticks.
-        
+        You are an expert agricultural scientist and computer vision model.
+
+        STEP 1 — PLANT CHECK:
+        First, look at the image carefully. Decide if it shows a plant, crop, leaf, tree, stem, fruit on plant, or any agriculture-related subject.
+        - If the image is NOT a plant (e.g. a person, animal, vehicle, food, building, random object, selfie, etc.) — respond ONLY with:
+          {"not_a_plant": true}
+        - If the image IS a plant/leaf/crop/tree — continue to STEP 2.
+
+        STEP 2 — DISEASE ANALYSIS:
+        Analyze the plant image for diseases. Respond ONLY with a valid JSON object. No extra text, no markdown, no backticks.
+
         Use this exact format:
         {
+          "not_a_plant": false,
+          "plant_type": "Tomato / Rice / Wheat / etc.",
           "disease": "Name of the disease or Healthy",
           "confidence": 91,
           "severity": "Low",
@@ -53,11 +61,13 @@ async def analyze_crop(file: UploadFile = File(...)):
           "organic_treatment": "Natural/organic alternative treatment",
           "fertilizer_recommendation": "What fertilizer to use now"
         }
-        
-        Severity must be one of: Low, Medium, High, Critical
-        If the plant is healthy, set is_healthy to true and disease to "Healthy"
-        confidence should be a number between 70 and 98
-        Be specific and practical in treatment advice for Indian farmers
+
+        Rules:
+        - Severity must be one of: Low, Medium, High, Critical
+        - If the plant is healthy, set is_healthy to true and disease to "Healthy"
+        - confidence should be a number between 70 and 98
+        - Be specific and practical in treatment advice for Indian farmers
+        - plant_type should be the common crop name in English
         """
 
         response = model.generate_content([prompt, image])
@@ -66,6 +76,10 @@ async def analyze_crop(file: UploadFile = File(...)):
         # Clean up response in case Gemini adds backticks
         raw = re.sub(r"```json|```", "", raw).strip()
         result = json.loads(raw)
+
+        # If not a plant, return early with a clear flag
+        if result.get("not_a_plant"):
+            return {"success": False, "not_a_plant": True, "error": "Image does not appear to be a plant or crop. Please upload a clear photo of a leaf, crop, or tree."}
 
         return {"success": True, "result": result}
 
