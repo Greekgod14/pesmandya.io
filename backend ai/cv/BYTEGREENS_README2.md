@@ -32,15 +32,6 @@ bytegreens/
 pip install fastapi uvicorn python-multipart pillow google-generativeai
 ```
 
-Note: It's safer to install from the project's `requirements.txt` and to set your Gemini API key via an environment variable instead of pasting it into source files.
-
-Example:
-
-```
-pip install -r ../../requirements.txt
-export GEMINI_KEY="YOUR_KEY_HERE"  # or setx on Windows
-```
-
 ## Step 2 — Create main.py and paste this ENTIRE code
 
 ```python

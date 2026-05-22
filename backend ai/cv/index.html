@@ -422,7 +422,8 @@
     formData.append('file', selectedFile);
 
     try {
-      const response = await fetch('http://localhost:8000/analyze', {
+      // Send to the full CV engine for best results
+      const response = await fetch('http://localhost:8001/cv/analyze', {
         method: 'POST',
         body: formData
       });
@@ -447,6 +448,81 @@
   }
 
   function renderResult(r) {
+    // Support both the simple main.py output and the fused CV output from computer_vision.py
+    let diag = r.diagnosis || r;
+    // If fused CV result, map fields accordingly
+    if (r.diagnosis) {
+      const disease = diag.disease_name || 'Unknown';
+      const confidence = diag.confidence_percent || (diag.confidence || 0);
+      const affected = diag.affected_area_percent || 0;
+      const severity = diag.severity || 'Unknown';
+      const plant = (r.plant_identity && r.plant_identity.common_name) || '';
+      const urgency = (r.treatment_plan && r.treatment_plan.urgency) || '';
+      const treatment = (r.treatment_plan && (r.treatment_plan.immediate_steps || []).join('. ')) || (r.treatment_plan && r.treatment_plan.chemical && r.treatment_plan.chemical.product) || '';
+      const organic = (r.treatment_plan && r.treatment_plan.organic) || (r.disease_database_entry && r.disease_database_entry.organic_treatment) || '';
+      const fertilizer = (r.nutrition && r.nutrition.recommendation) || '';
+      const prevention = (r.prevention && (r.prevention.cultural_practices || []).join('; ')) || '';
+      const yield_loss = diag.yield_loss_estimate || (r.impact_assessment && (r.impact_assessment.estimated_income_loss_percent ? (r.impact_assessment.estimated_income_loss_percent + '%') : '')) || '';
+
+      const isHealthy = !!diag.is_healthy || disease.toLowerCase() === 'healthy';
+      const icon = isHealthy ? '✅' : '⚠️';
+      const nameClass = isHealthy ? 'healthy' : 'sick';
+
+      resultCard.innerHTML = `
+        <div class="disease-header">
+          <div class="status-icon">${icon}</div>
+          <div>
+            <div class="disease-name ${nameClass}">${disease}</div>
+            <div class="confidence">${plant ? '🌱 ' + plant + ' · ' : ''}Confidence: ${confidence}% | Affected: ${affected}% of leaf area</div>
+          </div>
+          <div class="severity-badge severity-${severity}">${severity} Severity</div>
+        </div>
+
+        ${!isHealthy ? `<div class="urgency-bar">🚨 ${urgency}</div>` : ''}
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="value">${confidence}%</div>
+            <div class="label">AI Confidence</div>
+          </div>
+          <div class="stat-box">
+            <div class="value" style="color:${isHealthy ? '#4caf50' : '#f44336'}">${yield_loss}</div>
+            <div class="label">Yield Risk</div>
+          </div>
+          <div class="stat-box">
+            <div class="value">${affected}%</div>
+            <div class="label">Affected Area</div>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h3>💊 Treatment</h3>
+          <p>${treatment}</p>
+        </div>
+
+        <div class="info-section">
+          <h3>🌿 Organic Alternative</h3>
+          <p>${organic}</p>
+        </div>
+
+        <div class="info-section">
+          <h3>🌾 Fertilizer Now</h3>
+          <p>${fertilizer}</p>
+        </div>
+
+        <div class="info-section">
+          <h3>🛡️ Prevention</h3>
+          <p>${prevention}</p>
+        </div>
+
+        <button class="reset-btn" onclick="resetScanner()">← Scan Another Crop</button>
+      `;
+
+      resultCard.style.display = 'block';
+      return;
+    }
+
+    // Fallback: original simple API format
     const isHealthy = r.is_healthy || r.disease === 'Healthy';
     const icon = isHealthy ? '✅' : '⚠️';
     const nameClass = isHealthy ? 'healthy' : 'sick';

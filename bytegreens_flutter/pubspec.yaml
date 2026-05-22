@@ -1,0 +1,22 @@
+name: bytegreens_flutter
+description: ByteGreens AgriTech mobile frontend for the Pes Hack backend.
+publish_to: "none"
+version: 0.1.0+1
+environment:
+  sdk: ">=2.18.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  http: ^1.1.0
+  image_picker: ^0.8.8+7
+  flutter_tts: ^3.7.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true

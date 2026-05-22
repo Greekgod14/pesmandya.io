@@ -6,6 +6,7 @@ from PIL import Image
 import io
 import json
 import re
+import os
 
 app = FastAPI()
 
@@ -16,10 +17,16 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-# PASTE YOUR GEMINI KEY HERE
-GEMINI_KEY = "AIzaSyDm5iJthkobk765CaORS8hUpnVNi0YcG8c"
-genai.configure(api_key=GEMINI_KEY)
-model = genai.GenerativeModel("gemini-1.5-flash")
+# Load Gemini API key from environment for safety
+GEMINI_KEY = os.environ.get("GEMINI_KEY")
+if GEMINI_KEY:
+    genai.configure(api_key=GEMINI_KEY)
+    try:
+        model = genai.GenerativeModel("gemini-1.5-flash")
+    except Exception:
+        model = None
+else:
+    model = None
 
 
 @app.get("/")
@@ -69,6 +76,9 @@ async def analyze_crop(file: UploadFile = File(...)):
         - Be specific and practical in treatment advice for Indian farmers
         - plant_type should be the common crop name in English
         """
+
+        if model is None:
+            return {"success": False, "error": "Gemini API key not configured. Set GEMINI_KEY environment variable."}
 
         response = model.generate_content([prompt, image])
         raw = response.text.strip()
