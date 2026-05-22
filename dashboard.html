@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ByteGreens — Impact Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #050a05; color: #e8f5e9; font-family: 'Space Grotesk', sans-serif; min-height: 100vh; }
+
+    nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 32px; background: rgba(0,0,0,0.6);
+      border-bottom: 1px solid #1a3a1a; position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 22px; font-weight: 700; color: #4caf50; }
+    .logo span { color: #fff; }
+    nav a { color: #aaa; text-decoration: none; margin-left: 24px; font-size: 14px; }
+    nav a:hover, nav a.active { color: #4caf50; }
+
+    .hero { text-align: center; padding: 50px 20px 30px; }
+    .hero h1 { font-size: 42px; font-weight: 700; background: linear-gradient(135deg, #4caf50, #8bc34a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: #888; margin-top: 8px; }
+
+    .timestamp {
+      display: inline-block;
+      color: #555;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
+
+    .big-stats {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px;
+    }
+
+    .big-card {
+      background: #0d1f0d; border: 1px solid #1e4a1e;
+      border-radius: 20px; padding: 24px;
+      transition: all 0.3s; animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .big-card:hover { border-color: #4caf50; }
+
+    .big-card .icon { font-size: 36px; margin-bottom: 12px; }
+    .big-card .value { font-size: 36px; font-weight: 700; color: #4caf50; }
+    .big-card .label { color: #888; font-size: 14px; margin-top: 6px; }
+    .big-card .change { color: #a5d6a7; font-size: 12px; margin-top: 4px; }
+
+    /* Skeleton loading */
+    .skeleton {
+      background: linear-gradient(90deg, #0d1f0d 25%, #162b16 50%, #0d1f0d 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+      height: 36px;
+      width: 80px;
+      display: inline-block;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    .section { background: #0d1f0d; border: 1px solid #1e4a1e; border-radius: 20px; padding: 24px; margin-bottom: 20px; }
+    .section h2 { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #4caf50; }
+
+    .region-row { margin-bottom: 16px; }
+    .region-label { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; }
+    .region-label span:last-child { color: #4caf50; }
+    .bar-track { background: #0a150a; border-radius: 4px; height: 8px; }
+    .bar-fill { background: linear-gradient(90deg, #2e7d32, #4caf50); height: 8px; border-radius: 4px; width: 0; transition: width 1s ease; }
+
+    .disease-list { display: flex; flex-direction: column; gap: 12px; }
+    .disease-row { display: flex; justify-content: space-between; align-items: center; }
+    .disease-name-text { font-size: 14px; color: #ccc; }
+    .disease-count {
+      background: #1b5e20; color: #a5d6a7;
+      padding: 4px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+    }
+
+    .weather-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .weather-box {
+      background: #0a150a; border: 1px solid #1e3a1e;
+      border-radius: 12px; padding: 14px; text-align: center;
+    }
+    .weather-box .w-icon { font-size: 28px; margin-bottom: 8px; }
+    .weather-box .w-value { font-size: 20px; font-weight: 700; color: #4caf50; }
+    .weather-box .w-label { font-size: 12px; color: #666; margin-top: 4px; }
+
+    .alert-box {
+      background: rgba(255,152,0,0.1); border: 1px solid #5a3a00;
+      border-radius: 12px; padding: 14px; margin-top: 14px; font-size: 14px; color: #ffcc80;
+    }
+    .alert-box p { margin-bottom: 6px; }
+    .alert-box p:last-child { margin-bottom: 0; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Byte<span>Greens</span></div>
+  <div>
+    <a href="index.html">🔬 Scanner</a>
+    <a href="market.html">🏪 Market</a>
+    <a href="dashboard.html" class="active">📊 Dashboard</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>Impact Dashboard</h1>
+  <p>Real-time overview of ByteGreens across Karnataka</p>
+  <div class="timestamp" id="timestamp">Last updated just now</div>
+</div>
+
+<div class="container">
+
+  <div class="big-stats" id="bigStats">
+    <div class="big-card"><div class="icon">👨‍🌾</div><div class="value"><span class="skeleton"></span></div><div class="label">Farmers Helped</div><div class="change">↑ 12% this month</div></div>
+    <div class="big-card"><div class="icon">🌿</div><div class="value"><span class="skeleton"></span></div><div class="label">Crops Scanned</div><div class="change">↑ 8% this week</div></div>
+    <div class="big-card"><div class="icon">🔬</div><div class="value"><span class="skeleton"></span></div><div class="label">Diseases Caught Early</div><div class="change">↑ 23% vs last month</div></div>
+    <div class="big-card"><div class="icon">💰</div><div class="value"><span class="skeleton"></span></div><div class="label">Farmer Income Saved</div><div class="change">₹42 Lakhs total</div></div>
+  </div>
+
+  <div class="section">
+    <h2>🗺 Active Regions</h2>
+    <div id="regions"></div>
+  </div>
+
+  <div class="section">
+    <h2>🦠 Top Diseases Detected</h2>
+    <div class="disease-list" id="diseases"></div>
+  </div>
+
+  <div class="section">
+    <h2>🌤 Live Weather & Soil (Mandya)</h2>
+    <div class="weather-grid" id="weather"></div>
+    <div class="alert-box" id="alerts"></div>
+  </div>
+
+</div>
+
+<script>
+  // Update timestamp
+  function updateTimestamp() {
+    const el = document.getElementById('timestamp');
+    el.textContent = 'Last updated ' + new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  async function loadDashboard() {
+    try {
+      const [statsRes, weatherRes] = await Promise.all([
+        fetch('http://localhost:8000/stats'),
+        fetch('http://localhost:8000/weather')
+      ]);
+
+      const stats = await statsRes.json();
+      const weather = await weatherRes.json();
+
+      // Big stats
+      const cards = document.querySelectorAll('.big-card .value');
+      const values = [
+        stats.farmers_helped.toLocaleString(),
+        stats.crops_scanned.toLocaleString(),
+        stats.diseases_caught.toLocaleString(),
+        '₹' + stats.income_saved_lakhs + 'L'
+      ];
+      cards.forEach((card, i) => { card.textContent = values[i]; });
+
+      // Regions
+      document.getElementById('regions').innerHTML = stats.regions.map(r => `
+        <div class="region-row">
+          <div class="region-label"><span>${r.name} (${r.farmers} farmers)</span><span>${r.percent}%</span></div>
+          <div class="bar-track"><div class="bar-fill" id="bar-${r.name}" style="width: 0%"></div></div>
+        </div>
+      `).join('');
+
+      // Animate bars after render
+      setTimeout(() => {
+        stats.regions.forEach(r => {
+          const bar = document.getElementById('bar-' + r.name);
+          if (bar) bar.style.width = r.percent + '%';
+        });
+      }, 100);
+
+      // Diseases
+      document.getElementById('diseases').innerHTML = stats.top_diseases.map(d => `
+        <div class="disease-row">
+          <span class="disease-name-text">${d.name}</span>
+          <span class="disease-count">${d.count} cases</span>
+        </div>
+      `).join('');
+
+      // Weather
+      document.getElementById('weather').innerHTML = `
+        <div class="weather-box"><div class="w-icon">🌡️</div><div class="w-value">${weather.temperature}°C</div><div class="w-label">Temperature</div></div>
+        <div class="weather-box"><div class="w-icon">💧</div><div class="w-value">${weather.humidity}%</div><div class="w-label">Humidity</div></div>
+        <div class="weather-box"><div class="w-icon">🌱</div><div class="w-value">${weather.soil_moisture}%</div><div class="w-label">Soil Moisture</div></div>
+        <div class="weather-box"><div class="w-icon">⚗️</div><div class="w-value">pH ${weather.soil_ph}</div><div class="w-label">Soil pH</div></div>
+        <div class="weather-box"><div class="w-icon">💨</div><div class="w-value">${weather.wind_speed}</div><div class="w-label">Wind Speed</div></div>
+        <div class="weather-box"><div class="w-icon">☀️</div><div class="w-value">UV ${weather.uv_index}</div><div class="w-label">UV Index</div></div>
+      `;
+
+      document.getElementById('alerts').innerHTML = weather.alerts.map(a => `<p>⚠️ ${a}</p>`).join('');
+
+      updateTimestamp();
+
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  loadDashboard();
+</script>
+
+</body>
+</html>

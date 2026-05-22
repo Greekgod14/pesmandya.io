@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ByteGreens — AI Crop Scanner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background: #050a05;
+      color: #e8f5e9;
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 32px;
+      background: rgba(0,0,0,0.6);
+      border-bottom: 1px solid #1a3a1a;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: #4caf50;
+    }
+
+    .logo span { color: #fff; }
+
+    nav a {
+      color: #aaa;
+      text-decoration: none;
+      margin-left: 24px;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    nav a:hover, nav a.active { color: #4caf50; }
+
+    .hero {
+      text-align: center;
+      padding: 60px 20px 40px;
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #4caf50, #8bc34a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      color: #888;
+      font-size: 18px;
+    }
+
+    .accuracy-badge {
+      display: inline-block;
+      background: rgba(76,175,80,0.15);
+      border: 1px solid #2e7d32;
+      color: #4caf50;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .upload-zone {
+      border: 2px dashed #2e7d32;
+      border-radius: 20px;
+      padding: 60px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: rgba(76, 175, 80, 0.03);
+      margin-bottom: 24px;
+    }
+
+    .upload-zone:hover {
+      border-color: #4caf50;
+      background: rgba(76, 175, 80, 0.08);
+    }
+
+    .upload-zone.dragging {
+      border-color: #8bc34a;
+      background: rgba(139, 195, 74, 0.1);
+    }
+
+    .upload-icon { font-size: 64px; margin-bottom: 16px; }
+
+    .upload-zone h2 {
+      font-size: 22px;
+      margin-bottom: 8px;
+      color: #4caf50;
+    }
+
+    .upload-zone p { color: #666; font-size: 14px; }
+
+    #fileInput { display: none; }
+
+    .preview-container {
+      display: none;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .preview-container img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 16px;
+      border: 2px solid #2e7d32;
+    }
+
+    .scan-btn {
+      display: block;
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #2e7d32, #4caf50);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 24px;
+    }
+
+    .scan-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(76,175,80,0.3); }
+    .scan-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid #1a3a1a;
+      border-top: 4px solid #4caf50;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading p { color: #4caf50; font-size: 16px; }
+
+    .result-card {
+      display: none;
+      background: #0d1f0d;
+      border-radius: 20px;
+      padding: 28px;
+      border: 1px solid #1e4a1e;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .disease-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #1e4a1e;
+    }
+
+    .status-icon { font-size: 48px; }
+
+    .disease-name {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .disease-name.healthy { color: #4caf50; }
+    .disease-name.sick { color: #f44336; }
+
+    .confidence { color: #888; font-size: 14px; margin-top: 4px; }
+
+    .severity-badge {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-left: auto;
+    }
+
+    .severity-Low { background: #1b5e20; color: #a5d6a7; }
+    .severity-Medium { background: #e65100; color: #ffcc80; }
+    .severity-High { background: #b71c1c; color: #ef9a9a; }
+    .severity-Critical { background: #880e4f; color: #f48fb1; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      background: #0a150a;
+      border: 1px solid #1e3a1e;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .stat-box .value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #4caf50;
+    }
+
+    .stat-box .label {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .info-section {
+      background: #0a150a;
+      border: 1px solid #1e3a1e;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .info-section h3 {
+      color: #4caf50;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-section p {
+      color: #ccc;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .urgency-bar {
+      background: #ff5722;
+      color: white;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .reset-btn {
+      background: transparent;
+      border: 1px solid #2e7d32;
+      color: #4caf50;
+      padding: 12px;
+      border-radius: 10px;
+      width: 100%;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 16px;
+      transition: all 0.2s;
+    }
+
+    .reset-btn:hover { background: #0d2a0d; }
+
+    .error-card {
+      display: none;
+      background: #1a0a0a;
+      border: 1px solid #4a1a1a;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      color: #f44336;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Byte<span>Greens</span></div>
+  <div>
+    <a href="index.html" class="active">🔬 Scanner</a>
+    <a href="market.html">🏪 Market</a>
+    <a href="dashboard.html">📊 Dashboard</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>AI Crop Scanner</h1>
+  <p>Upload a photo of your crop. Get instant disease diagnosis.</p>
+  <div class="accuracy-badge">✅ 94% Accuracy — Powered by Gemini AI</div>
+</div>
+
+<div class="container">
+
+  <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+    <div class="upload-icon">📷</div>
+    <h2>Upload Crop Photo</h2>
+    <p>Click here or drag and drop your image</p>
+    <p style="margin-top:8px; font-size:12px; color:#555">Supports JPG, PNG, WEBP</p>
+    <input type="file" id="fileInput" accept="image/*">
+  </div>
+
+  <div class="preview-container" id="previewContainer">
+    <img id="previewImg" src="" alt="Preview">
+    <button class="scan-btn" id="scanBtn" onclick="scanCrop()">🔬 Analyze Crop</button>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="loading-spinner"></div>
+    <p>AI is analyzing your crop...</p>
+    <p style="color:#555; font-size:13px; margin-top:8px">This takes 3-5 seconds</p>
+  </div>
+
+  <div class="result-card" id="resultCard"></div>
+  <div class="error-card" id="errorCard">⚠️ Analysis failed. Please try another image.</div>
+
+</div>
+
+<script>
+  const fileInput = document.getElementById('fileInput');
+  const previewContainer = document.getElementById('previewContainer');
+  const previewImg = document.getElementById('previewImg');
+  const uploadZone = document.getElementById('uploadZone');
+  const loading = document.getElementById('loading');
+  const resultCard = document.getElementById('resultCard');
+  const errorCard = document.getElementById('errorCard');
+
+  let selectedFile = null;
+
+  fileInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    selectedFile = file;
+    const url = URL.createObjectURL(file);
+    previewImg.src = url;
+    previewContainer.style.display = 'block';
+    uploadZone.style.display = 'none';
+    resultCard.style.display = 'none';
+    errorCard.style.display = 'none';
+  });
+
+  // Drag and drop
+  uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragging'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragging'));
+  uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove('dragging');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      selectedFile = file;
+      previewImg.src = URL.createObjectURL(file);
+      previewContainer.style.display = 'block';
+      uploadZone.style.display = 'none';
+    }
+  });
+
+  async function scanCrop() {
+    if (!selectedFile) return;
+
+    document.getElementById('scanBtn').disabled = true;
+    loading.style.display = 'block';
+    resultCard.style.display = 'none';
+    errorCard.style.display = 'none';
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    try {
+      const response = await fetch('http://localhost:8000/analyze', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+
+      loading.style.display = 'none';
+
+      if (data.success && data.result) {
+        renderResult(data.result);
+      } else {
+        errorCard.style.display = 'block';
+      }
+    } catch (err) {
+      loading.style.display = 'none';
+      errorCard.style.display = 'block';
+    }
+
+    document.getElementById('scanBtn').disabled = false;
+  }
+
+  function renderResult(r) {
+    const isHealthy = r.is_healthy || r.disease === 'Healthy';
+    const icon = isHealthy ? '✅' : '⚠️';
+    const nameClass = isHealthy ? 'healthy' : 'sick';
+
+    resultCard.innerHTML = `
+      <div class="disease-header">
+        <div class="status-icon">${icon}</div>
+        <div>
+          <div class="disease-name ${nameClass}">${r.disease}</div>
+          <div class="confidence">Confidence: ${r.confidence}% | Affected: ${r.affected_area_percent}% of leaf area</div>
+        </div>
+        <div class="severity-badge severity-${r.severity}">${r.severity} Severity</div>
+      </div>
+
+      ${!isHealthy ? `<div class="urgency-bar">🚨 ${r.urgency}</div>` : ''}
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="value">${r.confidence}%</div>
+          <div class="label">AI Confidence</div>
+        </div>
+        <div class="stat-box">
+          <div class="value" style="color:${isHealthy ? '#4caf50' : '#f44336'}">${r.estimated_yield_loss}</div>
+          <div class="label">Yield Risk</div>
+        </div>
+        <div class="stat-box">
+          <div class="value">${r.affected_area_percent}%</div>
+          <div class="label">Affected Area</div>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <h3>💊 Treatment</h3>
+        <p>${r.treatment}</p>
+      </div>
+
+      <div class="info-section">
+        <h3>🌿 Organic Alternative</h3>
+        <p>${r.organic_treatment}</p>
+      </div>
+
+      <div class="info-section">
+        <h3>🌾 Fertilizer Now</h3>
+        <p>${r.fertilizer_recommendation}</p>
+      </div>
+
+      <div class="info-section">
+        <h3>🛡️ Prevention</h3>
+        <p>${r.prevention}</p>
+      </div>
+
+      <button class="reset-btn" onclick="resetScanner()">← Scan Another Crop</button>
+    `;
+
+    resultCard.style.display = 'block';
+  }
+
+  function resetScanner() {
+    selectedFile = null;
+    fileInput.value = '';
+    uploadZone.style.display = 'block';
+    previewContainer.style.display = 'none';
+    resultCard.style.display = 'none';
+    errorCard.style.display = 'none';
+  }
+</script>
+
+</body>
+</html>

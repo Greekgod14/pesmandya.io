@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ByteGreens — Smart Market</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #050a05; color: #e8f5e9; font-family: 'Space Grotesk', sans-serif; min-height: 100vh; }
+
+    nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 32px; background: rgba(0,0,0,0.6);
+      border-bottom: 1px solid #1a3a1a; position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 22px; font-weight: 700; color: #4caf50; }
+    .logo span { color: #fff; }
+    nav a { color: #aaa; text-decoration: none; margin-left: 24px; font-size: 14px; transition: color 0.2s; }
+    nav a:hover, nav a.active { color: #4caf50; }
+
+    .hero { text-align: center; padding: 50px 20px 30px; }
+    .hero h1 { font-size: 42px; font-weight: 700; background: linear-gradient(135deg, #4caf50, #8bc34a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: #888; margin-top: 8px; }
+
+    .banner {
+      background: linear-gradient(135deg, #1b5e20, #2e7d32);
+      margin: 0 20px 30px;
+      border-radius: 16px;
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-around;
+      text-align: center;
+    }
+    .banner-stat .value { font-size: 28px; font-weight: 700; color: #a5d6a7; }
+    .banner-stat .label { font-size: 12px; color: #81c784; margin-top: 4px; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 0 20px 40px; }
+
+    .filter-bar {
+      display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 8px 20px; border-radius: 20px; border: 1px solid #2e7d32;
+      background: transparent; color: #4caf50; cursor: pointer; font-size: 13px;
+      transition: all 0.2s;
+    }
+    .filter-btn.active, .filter-btn:hover { background: #2e7d32; color: white; }
+
+    .card {
+      background: #0d1f0d;
+      border: 1px solid #1e4a1e;
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 16px;
+      transition: all 0.3s;
+      animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .card:hover { border-color: #4caf50; transform: translateY(-2px); }
+
+    .card-header {
+      display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;
+    }
+    .crop-name { font-size: 22px; font-weight: 700; }
+    .farmer-info { color: #888; font-size: 14px; margin-top: 4px; }
+    .verified-badge {
+      background: #0d2a0d; border: 1px solid #2e7d32;
+      color: #4caf50; font-size: 12px; padding: 4px 12px; border-radius: 20px;
+    }
+
+    .price-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;
+    }
+    .price-box { border-radius: 12px; padding: 14px; text-align: center; }
+    .price-box.green { background: rgba(76,175,80,0.1); border: 1px solid #2e7d32; }
+    .price-box.red { background: rgba(244,67,54,0.1); border: 1px solid #4a1a1a; }
+    .price-box.gold { background: rgba(255,193,7,0.1); border: 1px solid #5a4a00; }
+    .price-box .amount { font-size: 20px; font-weight: 700; }
+    .price-box.green .amount { color: #4caf50; }
+    .price-box.red .amount { color: #f44336; }
+    .price-box.gold .amount { color: #ffc107; }
+    .price-box .label { font-size: 11px; color: #888; margin-top: 4px; }
+
+    .card-footer { display: flex; gap: 10px; }
+    .btn-primary {
+      flex: 1; padding: 12px; background: linear-gradient(135deg, #2e7d32, #4caf50);
+      color: white; border: none; border-radius: 10px; font-size: 14px;
+      font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-secondary {
+      padding: 12px 20px; background: transparent; border: 1px solid #2e7d32;
+      color: #4caf50; border-radius: 10px; font-size: 14px; cursor: pointer;
+    }
+
+    .toast {
+      position: fixed; bottom: 30px; right: 30px;
+      background: #1b5e20; color: white; padding: 14px 24px;
+      border-radius: 12px; font-size: 14px; font-weight: 600;
+      display: none; animation: slideIn 0.3s ease; z-index: 999;
+    }
+    @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Byte<span>Greens</span></div>
+  <div>
+    <a href="index.html">🔬 Scanner</a>
+    <a href="market.html" class="active">🏪 Market</a>
+    <a href="dashboard.html">📊 Dashboard</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>Smart Market</h1>
+  <p>Direct farmer-to-buyer. Zero middlemen. Blockchain verified.</p>
+</div>
+
+<div class="banner">
+  <div class="banner-stat"><div class="value">₹42L+</div><div class="label">Saved for Farmers</div></div>
+  <div class="banner-stat"><div class="value">1,247</div><div class="label">Active Farmers</div></div>
+  <div class="banner-stat"><div class="value">94%</div><div class="label">Price Transparency</div></div>
+  <div class="banner-stat"><div class="value">⛓ 100%</div><div class="label">Blockchain Verified</div></div>
+</div>
+
+<div class="container">
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterCrops('all', this)">All Crops</button>
+    <button class="filter-btn" onclick="filterCrops('Tomatoes', this)">Tomatoes</button>
+    <button class="filter-btn" onclick="filterCrops('Rice', this)">Rice</button>
+    <button class="filter-btn" onclick="filterCrops('Maize', this)">Maize</button>
+    <button class="filter-btn" onclick="filterCrops('Ragi', this)">Ragi</button>
+  </div>
+
+  <div id="listings"></div>
+</div>
+
+<div class="toast" id="toast">✅ Request sent to farmer!</div>
+
+<script>
+  let allListings = [];
+
+  async function loadMarket() {
+    try {
+      const res = await fetch('http://localhost:8000/market');
+      const data = await res.json();
+      allListings = data.listings;
+      renderListings(allListings);
+    } catch(e) {
+      document.getElementById('listings').innerHTML = '<p style="text-align:center;color:#888;padding:40px">Could not load market data. Is the backend running?</p>';
+    }
+  }
+
+  function renderListings(listings) {
+    const container = document.getElementById('listings');
+    container.innerHTML = listings.map(item => `
+      <div class="card" data-crop="${item.crop}">
+        <div class="card-header">
+          <div>
+            <div class="crop-name">${item.crop}</div>
+            <div class="farmer-info">👨‍🌾 ${item.farmer} · 📍 ${item.location} · 📦 ${item.quantity}</div>
+          </div>
+          ${item.blockchain_verified ? '<span class="verified-badge">⛓ Verified</span>' : ''}
+        </div>
+        <div class="price-grid">
+          <div class="price-box green">
+            <div class="amount">₹${item.bytegreens_price}/kg</div>
+            <div class="label">ByteGreens Price</div>
+          </div>
+          <div class="price-box red">
+            <div class="amount">₹${item.middleman_price}/kg</div>
+            <div class="label">Middleman Price</div>
+          </div>
+          <div class="price-box gold">
+            <div class="amount">₹${item.farmer_extra_earning.toLocaleString()}</div>
+            <div class="label">Farmer Saves</div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn-primary" onclick="connect(${item.id})">Connect with Farmer →</button>
+          <button class="btn-secondary">View Details</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function filterCrops(crop, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (crop === 'all') renderListings(allListings);
+    else renderListings(allListings.filter(l => l.crop.includes(crop)));
+  }
+
+  function connect(id) {
+    const toast = document.getElementById('toast');
+    toast.style.display = 'block';
+    setTimeout(() => toast.style.display = 'none', 3000);
+  }
+
+  loadMarket();
+</script>
+
+</body>
+</html>
