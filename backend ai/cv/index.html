@@ -6,317 +6,100 @@
   <title>ByteGreens — AI Crop Scanner</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body {
-      background: #050a05;
-      color: #e8f5e9;
-      font-family: 'Space Grotesk', sans-serif;
-      min-height: 100vh;
-    }
-
-    nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 32px;
-      background: rgba(0,0,0,0.6);
-      border-bottom: 1px solid #1a3a1a;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .logo {
-      font-size: 22px;
-      font-weight: 700;
-      color: #4caf50;
-    }
-
-    .logo span { color: #fff; }
-
-    nav a {
-      color: #aaa;
-      text-decoration: none;
-      margin-left: 24px;
-      font-size: 14px;
-      transition: color 0.2s;
-    }
-
-    nav a:hover, nav a.active { color: #4caf50; }
-
-    .hero {
-      text-align: center;
-      padding: 60px 20px 40px;
-    }
-
-    .hero h1 {
-      font-size: 48px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #4caf50, #8bc34a);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 12px;
-    }
-
-    .hero p {
-      color: #888;
-      font-size: 18px;
-    }
-
-    .accuracy-badge {
-      display: inline-block;
-      background: rgba(76,175,80,0.15);
-      border: 1px solid #2e7d32;
-      color: #4caf50;
-      padding: 6px 16px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      margin-top: 12px;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    .upload-zone {
-      border: 2px dashed #2e7d32;
-      border-radius: 20px;
-      padding: 60px 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s;
-      background: rgba(76, 175, 80, 0.03);
-      margin-bottom: 24px;
-    }
-
-    .upload-zone:hover {
-      border-color: #4caf50;
-      background: rgba(76, 175, 80, 0.08);
-    }
-
-    .upload-zone.dragging {
-      border-color: #8bc34a;
-      background: rgba(139, 195, 74, 0.1);
-    }
-
-    .upload-icon { font-size: 64px; margin-bottom: 16px; }
-
-    .upload-zone h2 {
-      font-size: 22px;
-      margin-bottom: 8px;
-      color: #4caf50;
-    }
-
-    .upload-zone p { color: #666; font-size: 14px; }
-
-    #fileInput { display: none; }
-
-    .preview-container {
-      display: none;
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .preview-container img {
-      max-width: 100%;
-      max-height: 300px;
-      border-radius: 16px;
-      border: 2px solid #2e7d32;
-    }
-
-    .scan-btn {
-      display: block;
-      width: 100%;
-      padding: 18px;
-      background: linear-gradient(135deg, #2e7d32, #4caf50);
-      color: white;
-      border: none;
-      border-radius: 14px;
-      font-size: 18px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s;
-      margin-bottom: 24px;
-    }
-
-    .scan-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(76,175,80,0.3); }
-    .scan-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-    .loading {
-      display: none;
-      text-align: center;
-      padding: 40px;
-    }
-
-    .loading-spinner {
-      width: 60px;
-      height: 60px;
-      border: 4px solid #1a3a1a;
-      border-top: 4px solid #4caf50;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 16px;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .loading p { color: #4caf50; font-size: 16px; }
-
-    .result-card {
-      display: none;
-      background: #0d1f0d;
-      border-radius: 20px;
-      padding: 28px;
-      border: 1px solid #1e4a1e;
-      animation: fadeIn 0.5s ease;
-    }
-
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    .disease-header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 24px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #1e4a1e;
-    }
-
-    .status-icon { font-size: 48px; }
-
-    .disease-name {
-      font-size: 28px;
-      font-weight: 700;
-    }
-
-    .disease-name.healthy { color: #4caf50; }
-    .disease-name.sick { color: #f44336; }
-
-    .confidence { color: #888; font-size: 14px; margin-top: 4px; }
-
-    .severity-badge {
-      padding: 6px 16px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      margin-left: auto;
-    }
-
-    .severity-Low { background: #1b5e20; color: #a5d6a7; }
-    .severity-Medium { background: #e65100; color: #ffcc80; }
-    .severity-High { background: #b71c1c; color: #ef9a9a; }
-    .severity-Critical { background: #880e4f; color: #f48fb1; }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .stat-box {
-      background: #0a150a;
-      border: 1px solid #1e3a1e;
-      border-radius: 12px;
-      padding: 16px;
-      text-align: center;
-    }
-
-    .stat-box .value {
-      font-size: 22px;
-      font-weight: 700;
-      color: #4caf50;
-    }
-
-    .stat-box .label {
-      font-size: 12px;
-      color: #666;
-      margin-top: 4px;
-    }
-
-    .info-section {
-      background: #0a150a;
-      border: 1px solid #1e3a1e;
-      border-radius: 14px;
-      padding: 18px;
-      margin-bottom: 14px;
-    }
-
-    .info-section h3 {
-      color: #4caf50;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .info-section p {
-      color: #ccc;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    .urgency-bar {
-      background: #ff5722;
-      color: white;
-      border-radius: 10px;
-      padding: 12px 18px;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .reset-btn {
-      background: transparent;
-      border: 1px solid #2e7d32;
-      color: #4caf50;
-      padding: 12px;
-      border-radius: 10px;
-      width: 100%;
-      cursor: pointer;
-      font-size: 14px;
-      margin-top: 16px;
-      transition: all 0.2s;
-    }
-
-    .reset-btn:hover { background: #0d2a0d; }
-
-    .error-card {
-      display: none;
-      background: #1a0a0a;
-      border: 1px solid #4a1a1a;
-      border-radius: 16px;
-      padding: 24px;
-      text-align: center;
-      color: #f44336;
-    }
-
-    .not-plant-card {
-      display: none;
-      background: #141005;
-      border: 1px solid #5a3e00;
-      border-radius: 16px;
-      padding: 28px;
-      text-align: center;
-    }
-    .not-plant-card .npc-icon { font-size: 52px; margin-bottom: 12px; }
-    .not-plant-card h3 { font-size: 20px; font-weight: 700; color: #ffc107; margin-bottom: 8px; }
-    .not-plant-card p { color: #999; font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
-    .not-plant-card ul { text-align: left; display: inline-block; color: #888; font-size: 13px; margin-bottom: 20px; }
-    .not-plant-card ul li { margin-bottom: 6px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#050a05;color:#e8f5e9;font-family:'Space Grotesk',sans-serif;min-height:100vh}
+    nav{display:flex;justify-content:space-between;align-items:center;padding:16px 32px;background:rgba(0,0,0,.7);border-bottom:1px solid #1a3a1a;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+    .logo{font-size:22px;font-weight:700;color:#4caf50}.logo span{color:#fff}
+    nav a{color:#aaa;text-decoration:none;margin-left:24px;font-size:14px;transition:color .2s}
+    nav a:hover,nav a.active{color:#4caf50}
+    .hero{text-align:center;padding:60px 20px 30px}
+    .hero h1{font-size:48px;font-weight:700;background:linear-gradient(135deg,#4caf50,#8bc34a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px}
+    .hero p{color:#888;font-size:18px}
+    .badge-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+    .badge{display:inline-block;background:rgba(76,175,80,.12);border:1px solid #2e7d32;color:#4caf50;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600}
+    .badge.gold{background:rgba(255,193,7,.1);border-color:#5a4a00;color:#ffc107}
+    .container{max-width:820px;margin:0 auto;padding:20px}
+    .pipeline-bar{display:flex;gap:0;margin-bottom:28px;border-radius:12px;overflow:hidden;border:1px solid #1e3a1e}
+    .pipe-step{flex:1;padding:10px 8px;text-align:center;font-size:11px;color:#555;background:#0a150a;border-right:1px solid #1e3a1e;transition:all .3s}
+    .pipe-step:last-child{border-right:none}
+    .pipe-step.active{background:#0d2a0d;color:#4caf50;font-weight:700}
+    .pipe-step.done{background:#0d2a0d;color:#2e7d32}
+    .upload-zone{border:2px dashed #2e7d32;border-radius:20px;padding:60px 20px;text-align:center;cursor:pointer;transition:all .3s;background:rgba(76,175,80,.03);margin-bottom:24px}
+    .upload-zone:hover{border-color:#4caf50;background:rgba(76,175,80,.08)}
+    .upload-zone.dragging{border-color:#8bc34a;background:rgba(139,195,74,.1)}
+    .upload-icon{font-size:64px;margin-bottom:16px}
+    .upload-zone h2{font-size:22px;margin-bottom:8px;color:#4caf50}
+    .upload-zone p{color:#666;font-size:14px}
+    #fileInput{display:none}
+    .preview-container{display:none;text-align:center;margin-bottom:24px}
+    .preview-container img{max-width:100%;max-height:300px;border-radius:16px;border:2px solid #2e7d32}
+    .scan-btn{display:block;width:100%;padding:18px;background:linear-gradient(135deg,#2e7d32,#4caf50);color:#fff;border:none;border-radius:14px;font-size:18px;font-weight:700;cursor:pointer;transition:all .3s;margin-top:16px;font-family:'Space Grotesk',sans-serif}
+    .scan-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(76,175,80,.35)}
+    .scan-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .loading{display:none;text-align:center;padding:40px}
+    .loading-spinner{width:60px;height:60px;border:4px solid #1a3a1a;border-top:4px solid #4caf50;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading p{color:#4caf50;font-size:16px}
+    .loading-stages{margin-top:16px;display:flex;flex-direction:column;gap:6px;max-width:300px;margin-left:auto;margin-right:auto}
+    .stage-item{display:flex;align-items:center;gap:10px;font-size:13px;color:#555;transition:color .3s}
+    .stage-item.active{color:#4caf50}
+    .stage-item.done{color:#2e7d32}
+    .stage-dot{width:8px;height:8px;border-radius:50%;background:#1a3a1a;flex-shrink:0;transition:background .3s}
+    .stage-item.active .stage-dot{background:#4caf50;box-shadow:0 0 6px #4caf50}
+    .stage-item.done .stage-dot{background:#2e7d32}
+    .result-card{display:none;background:#0d1f0d;border-radius:20px;padding:28px;border:1px solid #1e4a1e;animation:fadeIn .5s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .disease-header{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid #1e4a1e;flex-wrap:wrap}
+    .status-icon{font-size:48px}
+    .disease-name{font-size:26px;font-weight:700}
+    .disease-name.healthy{color:#4caf50}
+    .disease-name.sick{color:#f44336}
+    .disease-sci{font-size:13px;color:#666;font-style:italic;margin-top:2px}
+    .confidence{color:#888;font-size:13px;margin-top:4px}
+    .severity-badge{padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;margin-left:auto}
+    .severity-None,.severity-Low{background:#1b5e20;color:#a5d6a7}
+    .severity-Medium{background:#e65100;color:#ffcc80}
+    .severity-High{background:#b71c1c;color:#ef9a9a}
+    .severity-Critical{background:#880e4f;color:#f48fb1}
+    .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+    .stat-box{background:#0a150a;border:1px solid #1e3a1e;border-radius:12px;padding:16px;text-align:center}
+    .stat-box .value{font-size:22px;font-weight:700;color:#4caf50}
+    .stat-box .label{font-size:11px;color:#666;margin-top:4px}
+    .info-section{background:#0a150a;border:1px solid #1e3a1e;border-radius:14px;padding:18px;margin-bottom:12px}
+    .info-section h3{color:#4caf50;font-size:13px;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+    .info-section p,.info-section li{color:#ccc;font-size:14px;line-height:1.7}
+    .info-section ul{padding-left:18px}
+    .info-section li{margin-bottom:4px}
+    .urgency-bar{background:linear-gradient(135deg,#c62828,#e53935);color:#fff;border-radius:10px;padding:12px 18px;font-size:14px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .cv-strip{background:#050f05;border:1px solid #1a2a1a;border-radius:12px;padding:14px;margin-bottom:12px;font-size:12px;color:#555}
+    .cv-strip strong{color:#2e7d32}
+    .cv-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+    .cv-tag{background:#0a1a0a;border:1px solid #1e3a1e;color:#4caf50;padding:3px 10px;border-radius:10px;font-size:11px}
+    .nn-preds{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+    .nn-row{display:flex;align-items:center;gap:8px;font-size:12px}
+    .nn-bar-track{flex:1;background:#0a150a;border-radius:3px;height:6px}
+    .nn-bar-fill{background:linear-gradient(90deg,#2e7d32,#4caf50);height:6px;border-radius:3px;transition:width 1s ease}
+    .nn-label{color:#888;min-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .nn-score{color:#4caf50;min-width:36px;text-align:right}
+    .expert-note{background:rgba(76,175,80,.06);border:1px solid #2e7d32;border-radius:12px;padding:16px;margin-bottom:12px;font-size:14px;color:#a5d6a7;line-height:1.7}
+    .expert-note strong{color:#4caf50}
+    .reset-btn{background:transparent;border:1px solid #2e7d32;color:#4caf50;padding:12px;border-radius:10px;width:100%;cursor:pointer;font-size:14px;margin-top:16px;transition:all .2s;font-family:'Space Grotesk',sans-serif}
+    .reset-btn:hover{background:#0d2a0d}
+    .error-card{display:none;background:#1a0a0a;border:1px solid #4a1a1a;border-radius:16px;padding:28px;text-align:center}
+    .error-card h3{color:#f44336;font-size:18px;margin-bottom:8px}
+    .error-card p{color:#888;font-size:14px;margin-bottom:16px}
+    .not-plant-card{display:none;background:#141005;border:1px solid #5a3e00;border-radius:16px;padding:28px;text-align:center}
+    .not-plant-card h3{color:#ffc107;font-size:20px;margin-bottom:8px}
+    .not-plant-card p{color:#999;font-size:14px;line-height:1.6;margin-bottom:16px}
+    .impact-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
+    .impact-item{background:#0a150a;border:1px solid #1e3a1e;border-radius:10px;padding:12px;font-size:13px}
+    .impact-item .k{color:#666;font-size:11px;margin-bottom:4px}
+    .impact-item .v{color:#4caf50;font-weight:600}
+    @media(max-width:600px){.stats-grid{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}.disease-header{flex-direction:column;align-items:flex-start}.severity-badge{margin-left:0}}
   </style>
 </head>
 <body>
-
 <nav>
   <div class="logo">Byte<span>Greens</span></div>
   <div>
@@ -325,271 +108,270 @@
     <a href="dashboard.html">📊 Dashboard</a>
   </div>
 </nav>
-
 <div class="hero">
   <h1>AI Crop Scanner</h1>
   <p>Upload a photo of your crop. Get instant disease diagnosis.</p>
-  <div class="accuracy-badge">✅ 94% Accuracy — Powered by Gemini AI</div>
+  <div class="badge-row">
+    <span class="badge">✅ 94% Accuracy</span>
+    <span class="badge">🧠 3-Stage AI Pipeline</span>
+    <span class="badge gold">⚡ OpenCV + MobileNetV2 + Gemini</span>
+  </div>
 </div>
-
 <div class="container">
-
+  <div class="pipeline-bar">
+    <div class="pipe-step" id="ps1">📷 Upload</div>
+    <div class="pipe-step" id="ps2">🔍 OpenCV</div>
+    <div class="pipe-step" id="ps3">🧠 Neural Net</div>
+    <div class="pipe-step" id="ps4">✨ Gemini AI</div>
+    <div class="pipe-step" id="ps5">📊 Result</div>
+  </div>
   <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
     <div class="upload-icon">📷</div>
     <h2>Upload Crop Photo</h2>
     <p>Click here or drag and drop your image</p>
-    <p style="margin-top:8px; font-size:12px; color:#555">Supports JPG, PNG, WEBP</p>
+    <p style="margin-top:8px;font-size:12px;color:#555">Supports JPG, PNG, WEBP · Any crop or leaf</p>
     <input type="file" id="fileInput" accept="image/*">
   </div>
-
   <div class="preview-container" id="previewContainer">
     <img id="previewImg" src="" alt="Preview">
-    <button class="scan-btn" id="scanBtn" onclick="scanCrop()">🔬 Analyze Crop</button>
+    <button class="scan-btn" id="scanBtn" onclick="scanCrop()">🔬 Run Full AI Analysis</button>
   </div>
-
   <div class="loading" id="loading">
     <div class="loading-spinner"></div>
-    <p>AI is analyzing your crop...</p>
-    <p style="color:#555; font-size:13px; margin-top:8px">This takes 3-5 seconds</p>
+    <p id="loadingMsg">Initializing AI pipeline...</p>
+    <div class="loading-stages">
+      <div class="stage-item" id="st1"><div class="stage-dot"></div>Stage 1: OpenCV pixel analysis</div>
+      <div class="stage-item" id="st2"><div class="stage-dot"></div>Stage 2: MobileNetV2 classifier</div>
+      <div class="stage-item" id="st3"><div class="stage-dot"></div>Stage 3: Gemini expert enrichment</div>
+      <div class="stage-item" id="st4"><div class="stage-dot"></div>Stage 4: Fusing results</div>
+    </div>
   </div>
-
   <div class="result-card" id="resultCard"></div>
-  <div class="error-card" id="errorCard">⚠️ Analysis failed. Please try another image.</div>
-
+  <div class="error-card" id="errorCard">
+    <h3>⚠️ Analysis Failed</h3>
+    <p id="errorMsg">Could not connect to the AI backend. Make sure the server is running.</p>
+    <button class="reset-btn" onclick="resetScanner()">← Try Again</button>
+  </div>
   <div class="not-plant-card" id="notPlantCard">
-    <div class="npc-icon">🌿</div>
+    <div style="font-size:52px;margin-bottom:12px">🌿</div>
     <h3>Not a Plant Image</h3>
-    <p>Our AI detected that this image does not show a plant, leaf, or crop.<br>Please upload a clear photo of a plant for disease analysis.</p>
-    <ul>
-      <li>✅ Close-up of a leaf (healthy or diseased)</li>
-      <li>✅ Crop field or plant stem</li>
-      <li>✅ Fruit still on the plant</li>
-      <li>❌ People, animals, food, or objects</li>
-    </ul>
+    <p>Our AI detected this image does not show a plant, leaf, or crop.<br>Please upload a clear photo of a plant for disease analysis.</p>
     <button class="reset-btn" onclick="resetScanner()">← Try Again with a Plant Image</button>
   </div>
-
 </div>
-
 <script>
-  const fileInput = document.getElementById('fileInput');
-  const previewContainer = document.getElementById('previewContainer');
-  const previewImg = document.getElementById('previewImg');
-  const uploadZone = document.getElementById('uploadZone');
-  const loading = document.getElementById('loading');
-  const resultCard = document.getElementById('resultCard');
-  const errorCard = document.getElementById('errorCard');
-  const notPlantCard = document.getElementById('notPlantCard');
+const CV_URL = 'http://localhost:8001/cv/analyze';
+const SIMPLE_URL = 'http://localhost:8000/analyze';
+let selectedFile = null;
 
-  let selectedFile = null;
+const fileInput = document.getElementById('fileInput');
+const previewContainer = document.getElementById('previewContainer');
+const previewImg = document.getElementById('previewImg');
+const uploadZone = document.getElementById('uploadZone');
+const loading = document.getElementById('loading');
+const resultCard = document.getElementById('resultCard');
+const errorCard = document.getElementById('errorCard');
+const notPlantCard = document.getElementById('notPlantCard');
 
-  fileInput.addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    selectedFile = file;
-    const url = URL.createObjectURL(file);
-    previewImg.src = url;
-    previewContainer.style.display = 'block';
-    uploadZone.style.display = 'none';
-    resultCard.style.display = 'none';
-    errorCard.style.display = 'none';
-  });
+fileInput.addEventListener('change', e => {
+  const f = e.target.files[0]; if(!f) return;
+  selectedFile = f;
+  previewImg.src = URL.createObjectURL(f);
+  previewContainer.style.display = 'block';
+  uploadZone.style.display = 'none';
+  [resultCard,errorCard,notPlantCard].forEach(el=>el.style.display='none');
+  setPipeStep(1);
+});
 
-  // Drag and drop
-  uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragging'); });
-  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragging'));
-  uploadZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    uploadZone.classList.remove('dragging');
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-      selectedFile = file;
-      previewImg.src = URL.createObjectURL(file);
-      previewContainer.style.display = 'block';
-      uploadZone.style.display = 'none';
-    }
-  });
+uploadZone.addEventListener('dragover', e=>{e.preventDefault();uploadZone.classList.add('dragging')});
+uploadZone.addEventListener('dragleave', ()=>uploadZone.classList.remove('dragging'));
+uploadZone.addEventListener('drop', e=>{
+  e.preventDefault(); uploadZone.classList.remove('dragging');
+  const f = e.dataTransfer.files[0];
+  if(f && f.type.startsWith('image/')){
+    selectedFile = f; previewImg.src = URL.createObjectURL(f);
+    previewContainer.style.display='block'; uploadZone.style.display='none';
+    setPipeStep(1);
+  }
+});
 
-  async function scanCrop() {
-    if (!selectedFile) return;
+function setPipeStep(n){
+  for(let i=1;i<=5;i++){
+    const el=document.getElementById('ps'+i);
+    el.className='pipe-step'+(i<n?' done':i===n?' active':'');
+  }
+}
 
-    document.getElementById('scanBtn').disabled = true;
-    loading.style.display = 'block';
-    resultCard.style.display = 'none';
-    errorCard.style.display = 'none';
+function setStage(n){
+  for(let i=1;i<=4;i++){
+    const el=document.getElementById('st'+i);
+    el.className='stage-item'+(i<n?' done':i===n?' active':'');
+  }
+  const msgs=['Initializing...','Stage 1: OpenCV pixel analysis...','Stage 2: Neural network classifying...','Stage 3: Gemini expert enrichment...','Stage 4: Fusing all results...'];
+  document.getElementById('loadingMsg').textContent = msgs[n]||msgs[0];
+}
 
-    const formData = new FormData();
-    formData.append('file', selectedFile);
+async function scanCrop(){
+  if(!selectedFile) return;
+  document.getElementById('scanBtn').disabled = true;
+  loading.style.display = 'block';
+  [resultCard,errorCard,notPlantCard].forEach(el=>el.style.display='none');
+  setPipeStep(2); setStage(1);
 
+  const formData = new FormData();
+  formData.append('file', selectedFile);
+
+  // Animate stages while waiting
+  const stageTimer = setTimeout(()=>setStage(2), 800);
+  const stageTimer2 = setTimeout(()=>setStage(3), 2000);
+  const stageTimer3 = setTimeout(()=>setStage(4), 4000);
+
+  try {
+    // Try full CV engine first (port 8001), fallback to simple (port 8000)
+    let data = null;
     try {
-      // Send to the full CV engine for best results
-      const response = await fetch('http://localhost:8001/cv/analyze', {
-        method: 'POST',
-        body: formData
-      });
+      const res = await fetch(CV_URL, {method:'POST', body:formData});
+      data = await res.json();
+    } catch(e) {
+      // Fallback to simple backend
+      const res2 = await fetch(SIMPLE_URL, {method:'POST', body:formData});
+      data = await res2.json();
+    }
 
-      const data = await response.json();
+    clearTimeout(stageTimer); clearTimeout(stageTimer2); clearTimeout(stageTimer3);
+    setStage(5); setPipeStep(5);
+    loading.style.display = 'none';
 
-      loading.style.display = 'none';
-
-      if (data.success && data.result) {
-        renderResult(data.result);
-      } else if (data.not_a_plant) {
-        notPlantCard.style.display = 'block';
-      } else {
-        errorCard.style.display = 'block';
-      }
-    } catch (err) {
-      loading.style.display = 'none';
+    if(data.success === false && (data.is_plant === false || data.not_a_plant)){
+      notPlantCard.style.display = 'block';
+    } else if(data.success === false){
+      document.getElementById('errorMsg').textContent = data.error || 'Analysis failed.';
       errorCard.style.display = 'block';
+    } else {
+      // Handle both CV engine response and simple response
+      if(data.diagnosis) renderCVResult(data);
+      else if(data.result) renderSimpleResult(data.result);
+      else renderSimpleResult(data);
     }
-
-    document.getElementById('scanBtn').disabled = false;
+  } catch(err){
+    clearTimeout(stageTimer); clearTimeout(stageTimer2); clearTimeout(stageTimer3);
+    loading.style.display = 'none';
+    document.getElementById('errorMsg').textContent = 'Cannot connect to backend. Make sure uvicorn is running on port 8001 or 8000.';
+    errorCard.style.display = 'block';
   }
+  document.getElementById('scanBtn').disabled = false;
+}
 
-  function renderResult(r) {
-    // Support both the simple main.py output and the fused CV output from computer_vision.py
-    let diag = r.diagnosis || r;
-    // If fused CV result, map fields accordingly
-    if (r.diagnosis) {
-      const disease = diag.disease_name || 'Unknown';
-      const confidence = diag.confidence_percent || (diag.confidence || 0);
-      const affected = diag.affected_area_percent || 0;
-      const severity = diag.severity || 'Unknown';
-      const plant = (r.plant_identity && r.plant_identity.common_name) || '';
-      const urgency = (r.treatment_plan && r.treatment_plan.urgency) || '';
-      const treatment = (r.treatment_plan && (r.treatment_plan.immediate_steps || []).join('. ')) || (r.treatment_plan && r.treatment_plan.chemical && r.treatment_plan.chemical.product) || '';
-      const organic = (r.treatment_plan && r.treatment_plan.organic) || (r.disease_database_entry && r.disease_database_entry.organic_treatment) || '';
-      const fertilizer = (r.nutrition && r.nutrition.recommendation) || '';
-      const prevention = (r.prevention && (r.prevention.cultural_practices || []).join('; ')) || '';
-      const yield_loss = diag.yield_loss_estimate || (r.impact_assessment && (r.impact_assessment.estimated_income_loss_percent ? (r.impact_assessment.estimated_income_loss_percent + '%') : '')) || '';
+function renderCVResult(d){
+  const diag = d.diagnosis || {};
+  const plant = d.plant_identity || {};
+  const treat = d.treatment_plan || {};
+  const prev = d.prevention || {};
+  const nutr = d.nutrition || {};
+  const impact = d.impact_assessment || {};
+  const cv = d.cv_diagnostics || {};
+  const leaf = d.leaf_analysis || {};
 
-      const isHealthy = !!diag.is_healthy || disease.toLowerCase() === 'healthy';
-      const icon = isHealthy ? '✅' : '⚠️';
-      const nameClass = isHealthy ? 'healthy' : 'sick';
+  const isHealthy = diag.is_healthy || diag.disease_name === 'Healthy';
+  const icon = isHealthy ? '✅' : '⚠️';
+  const nameClass = isHealthy ? 'healthy' : 'sick';
+  const sev = diag.severity || 'Low';
+  const nn5 = diag.nn_top5_predictions || [];
+  const lesions = diag.cv_lesion_types || [];
 
-      resultCard.innerHTML = `
-        <div class="disease-header">
-          <div class="status-icon">${icon}</div>
-          <div>
-            <div class="disease-name ${nameClass}">${disease}</div>
-            <div class="confidence">${plant ? '🌱 ' + plant + ' · ' : ''}Confidence: ${confidence}% | Affected: ${affected}% of leaf area</div>
-          </div>
-          <div class="severity-badge severity-${severity}">${severity} Severity</div>
-        </div>
+  const chemTreat = treat.chemical ? `${treat.chemical.product || ''} @ ${treat.chemical.rate || ''}. ${treat.chemical.schedule || ''}` : '';
+  const immSteps = Array.isArray(treat.immediate_steps) ? treat.immediate_steps.join('; ') : '';
+  const cultPrac = Array.isArray(prev.cultural_practices) ? prev.cultural_practices : [];
 
-        ${!isHealthy ? `<div class="urgency-bar">🚨 ${urgency}</div>` : ''}
-
-        <div class="stats-grid">
-          <div class="stat-box">
-            <div class="value">${confidence}%</div>
-            <div class="label">AI Confidence</div>
-          </div>
-          <div class="stat-box">
-            <div class="value" style="color:${isHealthy ? '#4caf50' : '#f44336'}">${yield_loss}</div>
-            <div class="label">Yield Risk</div>
-          </div>
-          <div class="stat-box">
-            <div class="value">${affected}%</div>
-            <div class="label">Affected Area</div>
-          </div>
-        </div>
-
-        <div class="info-section">
-          <h3>💊 Treatment</h3>
-          <p>${treatment}</p>
-        </div>
-
-        <div class="info-section">
-          <h3>🌿 Organic Alternative</h3>
-          <p>${organic}</p>
-        </div>
-
-        <div class="info-section">
-          <h3>🌾 Fertilizer Now</h3>
-          <p>${fertilizer}</p>
-        </div>
-
-        <div class="info-section">
-          <h3>🛡️ Prevention</h3>
-          <p>${prevention}</p>
-        </div>
-
-        <button class="reset-btn" onclick="resetScanner()">← Scan Another Crop</button>
-      `;
-
-      resultCard.style.display = 'block';
-      return;
-    }
-
-    // Fallback: original simple API format
-    const isHealthy = r.is_healthy || r.disease === 'Healthy';
-    const icon = isHealthy ? '✅' : '⚠️';
-    const nameClass = isHealthy ? 'healthy' : 'sick';
-
-    resultCard.innerHTML = `
-      <div class="disease-header">
-        <div class="status-icon">${icon}</div>
-        <div>
-          <div class="disease-name ${nameClass}">${r.disease}</div>
-          <div class="confidence">${r.plant_type ? '🌱 ' + r.plant_type + ' · ' : ''}Confidence: ${r.confidence}% | Affected: ${r.affected_area_percent}% of leaf area</div>
-        </div>
-        <div class="severity-badge severity-${r.severity}">${r.severity} Severity</div>
+  resultCard.innerHTML = `
+    <div class="disease-header">
+      <div class="status-icon">${icon}</div>
+      <div style="flex:1">
+        <div class="disease-name ${nameClass}">${diag.disease_name || 'Unknown'}</div>
+        <div class="disease-sci">${diag.scientific_name || ''} ${diag.category ? '· '+diag.category : ''}</div>
+        <div class="confidence">🌱 ${plant.common_name||''} · Confidence: <strong>${diag.confidence_percent||0}%</strong> · Affected: <strong>${diag.affected_area_percent||0}%</strong> · Stage: ${diag.stage||'—'}</div>
       </div>
-
-      ${!isHealthy ? `<div class="urgency-bar">🚨 ${r.urgency}</div>` : ''}
-
-      <div class="stats-grid">
-        <div class="stat-box">
-          <div class="value">${r.confidence}%</div>
-          <div class="label">AI Confidence</div>
-        </div>
-        <div class="stat-box">
-          <div class="value" style="color:${isHealthy ? '#4caf50' : '#f44336'}">${r.estimated_yield_loss}</div>
-          <div class="label">Yield Risk</div>
-        </div>
-        <div class="stat-box">
-          <div class="value">${r.affected_area_percent}%</div>
-          <div class="label">Affected Area</div>
-        </div>
+      <div class="severity-badge severity-${sev}">${sev} Severity</div>
+    </div>
+    ${!isHealthy && treat.urgency ? `<div class="urgency-bar">🚨 ${treat.urgency}</div>` : ''}
+    <div class="stats-grid">
+      <div class="stat-box"><div class="value">${diag.confidence_percent||0}%</div><div class="label">AI Confidence</div></div>
+      <div class="stat-box"><div class="value" style="color:${isHealthy?'#4caf50':'#f44336'}">${diag.yield_loss_estimate||'0%'}</div><div class="label">Yield Risk</div></div>
+      <div class="stat-box"><div class="value">${diag.affected_area_percent||0}%</div><div class="label">Affected Area</div></div>
+    </div>
+    ${d.expert_note ? `<div class="expert-note"><strong>👨‍🔬 Expert Note:</strong> ${d.expert_note}</div>` : ''}
+    <div class="two-col">
+      <div class="info-section"><h3>💊 Chemical Treatment</h3><p>${chemTreat || treat.organic || '—'}</p></div>
+      <div class="info-section"><h3>🌿 Organic / Biological</h3><p>${treat.organic||''} ${treat.biological ? '<br>'+treat.biological : ''}</p></div>
+    </div>
+    ${immSteps ? `<div class="info-section"><h3>⚡ Immediate Steps</h3><p>${immSteps}</p></div>` : ''}
+    <div class="two-col">
+      <div class="info-section"><h3>🌾 Nutrition & Fertilizer</h3><p>${nutr.recommendation||'—'}</p>${nutr.avoid?`<p style="color:#f44336;margin-top:6px;font-size:12px">⚠️ Avoid: ${nutr.avoid}</p>`:''}</div>
+      <div class="info-section"><h3>🛡️ Prevention</h3><ul>${cultPrac.map(p=>`<li>${p}</li>`).join('')||'<li>—</li>'}</ul></div>
+    </div>
+    ${prev.resistant_varieties ? `<div class="info-section"><h3>🌱 Resistant Varieties</h3><p>${prev.resistant_varieties}</p></div>` : ''}
+    <div class="info-section"><h3>📊 Impact Assessment</h3>
+      <div class="impact-grid">
+        <div class="impact-item"><div class="k">Market Quality</div><div class="v">${impact.market_quality||'—'}</div></div>
+        <div class="impact-item"><div class="k">Income Loss Risk</div><div class="v" style="color:${isHealthy?'#4caf50':'#f44336'}">${impact.estimated_income_loss_percent||0}%</div></div>
+        <div class="impact-item"><div class="k">Harvest Readiness</div><div class="v">${impact.harvest_readiness||'—'}</div></div>
+        <div class="impact-item"><div class="k">Storage Advice</div><div class="v">${impact.storage_advice||'—'}</div></div>
       </div>
-
-      <div class="info-section">
-        <h3>💊 Treatment</h3>
-        <p>${r.treatment}</p>
+    </div>
+    <div class="cv-strip">
+      <strong>🔬 CV Diagnostics</strong> — OpenCV pixel analysis
+      <div class="cv-tags">
+        ${lesions.map(l=>`<span class="cv-tag">${l}</span>`).join('')}
+        ${cv.green_ratio !== undefined ? `<span class="cv-tag">Green: ${Math.round(cv.green_ratio*100)}%</span>` : ''}
+        ${cv.color_anomaly !== undefined ? `<span class="cv-tag">Anomaly: ${cv.color_anomaly}</span>` : ''}
+        ${(leaf.cv_dominant_colors||[]).map(c=>`<span class="cv-tag">${c}</span>`).join('')}
       </div>
+      ${nn5.length ? `<div style="margin-top:10px"><strong>Neural Net Top Predictions:</strong><div class="nn-preds">${nn5.slice(0,4).map(p=>`<div class="nn-row"><span class="nn-label">${p.plant||''} — ${p.disease||''}</span><div class="nn-bar-track"><div class="nn-bar-fill" style="width:${Math.round(p.score*100)}%"></div></div><span class="nn-score">${Math.round(p.score*100)}%</span></div>`).join('')}</div></div>` : ''}
+      ${(cv.image_notes||[]).length ? `<div style="margin-top:8px;color:#ffc107">${cv.image_notes.map(n=>`⚠️ ${n}`).join('<br>')}</div>` : ''}
+    </div>
+    <button class="reset-btn" onclick="resetScanner()">← Scan Another Crop</button>
+  `;
+  resultCard.style.display = 'block';
+  resultCard.scrollIntoView({behavior:'smooth',block:'start'});
+}
 
-      <div class="info-section">
-        <h3>🌿 Organic Alternative</h3>
-        <p>${r.organic_treatment}</p>
+function renderSimpleResult(r){
+  const isHealthy = r.is_healthy || r.disease === 'Healthy';
+  const icon = isHealthy ? '✅' : '⚠️';
+  const nameClass = isHealthy ? 'healthy' : 'sick';
+  const sev = r.severity || 'Low';
+  resultCard.innerHTML = `
+    <div class="disease-header">
+      <div class="status-icon">${icon}</div>
+      <div style="flex:1">
+        <div class="disease-name ${nameClass}">${r.disease||'Unknown'}</div>
+        <div class="confidence">${r.plant_type?'🌱 '+r.plant_type+' · ':''}Confidence: <strong>${r.confidence||0}%</strong> · Affected: <strong>${r.affected_area_percent||0}%</strong></div>
       </div>
+      <div class="severity-badge severity-${sev}">${sev} Severity</div>
+    </div>
+    ${!isHealthy && r.urgency ? `<div class="urgency-bar">🚨 ${r.urgency}</div>` : ''}
+    <div class="stats-grid">
+      <div class="stat-box"><div class="value">${r.confidence||0}%</div><div class="label">AI Confidence</div></div>
+      <div class="stat-box"><div class="value" style="color:${isHealthy?'#4caf50':'#f44336'}">${r.estimated_yield_loss||'0%'}</div><div class="label">Yield Risk</div></div>
+      <div class="stat-box"><div class="value">${r.affected_area_percent||0}%</div><div class="label">Affected Area</div></div>
+    </div>
+    <div class="info-section"><h3>💊 Treatment</h3><p>${r.treatment||'—'}</p></div>
+    <div class="info-section"><h3>🌿 Organic Alternative</h3><p>${r.organic_treatment||'—'}</p></div>
+    <div class="info-section"><h3>🌾 Fertilizer</h3><p>${r.fertilizer_recommendation||'—'}</p></div>
+    <div class="info-section"><h3>🛡️ Prevention</h3><p>${r.prevention||'—'}</p></div>
+    <button class="reset-btn" onclick="resetScanner()">← Scan Another Crop</button>
+  `;
+  resultCard.style.display = 'block';
+  resultCard.scrollIntoView({behavior:'smooth',block:'start'});
+}
 
-      <div class="info-section">
-        <h3>🌾 Fertilizer Now</h3>
-        <p>${r.fertilizer_recommendation}</p>
-      </div>
-
-      <div class="info-section">
-        <h3>🛡️ Prevention</h3>
-        <p>${r.prevention}</p>
-      </div>
-
-      <button class="reset-btn" onclick="resetScanner()">← Scan Another Crop</button>
-    `;
-
-    resultCard.style.display = 'block';
-  }
-
-  function resetScanner() {
-    selectedFile = null;
-    fileInput.value = '';
-    uploadZone.style.display = 'block';
-    previewContainer.style.display = 'none';
-    resultCard.style.display = 'none';
-    errorCard.style.display = 'none';
-    notPlantCard.style.display = 'none';
-  }
+function resetScanner(){
+  selectedFile = null; fileInput.value = '';
+  uploadZone.style.display = 'block';
+  previewContainer.style.display = 'none';
+  [resultCard,errorCard,notPlantCard].forEach(el=>el.style.display='none');
+  for(let i=1;i<=5;i++) document.getElementById('ps'+i).className='pipe-step';
+}
 </script>
-
 </body>
 </html>

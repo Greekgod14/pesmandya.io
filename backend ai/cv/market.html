@@ -6,105 +6,70 @@
   <title>ByteGreens — Smart Market</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #050a05; color: #e8f5e9; font-family: 'Space Grotesk', sans-serif; min-height: 100vh; }
-
-    nav {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 32px; background: rgba(0,0,0,0.6);
-      border-bottom: 1px solid #1a3a1a; position: sticky; top: 0; z-index: 100;
-    }
-    .logo { font-size: 22px; font-weight: 700; color: #4caf50; }
-    .logo span { color: #fff; }
-    nav a { color: #aaa; text-decoration: none; margin-left: 24px; font-size: 14px; transition: color 0.2s; }
-    nav a:hover, nav a.active { color: #4caf50; }
-
-    .hero { text-align: center; padding: 50px 20px 30px; }
-    .hero h1 { font-size: 42px; font-weight: 700; background: linear-gradient(135deg, #4caf50, #8bc34a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .hero p { color: #888; margin-top: 8px; }
-
-    .banner {
-      background: linear-gradient(135deg, #1b5e20, #2e7d32);
-      margin: 0 20px 30px;
-      border-radius: 16px;
-      padding: 20px 24px;
-      display: flex;
-      justify-content: space-around;
-      text-align: center;
-    }
-    .banner-stat .value { font-size: 28px; font-weight: 700; color: #a5d6a7; }
-    .banner-stat .label { font-size: 12px; color: #81c784; margin-top: 4px; }
-
-    .container { max-width: 900px; margin: 0 auto; padding: 0 20px 40px; }
-
-    .filter-bar {
-      display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap;
-    }
-    .filter-btn {
-      padding: 8px 20px; border-radius: 20px; border: 1px solid #2e7d32;
-      background: transparent; color: #4caf50; cursor: pointer; font-size: 13px;
-      transition: all 0.2s;
-    }
-    .filter-btn.active, .filter-btn:hover { background: #2e7d32; color: white; }
-
-    .card {
-      background: #0d1f0d;
-      border: 1px solid #1e4a1e;
-      border-radius: 20px;
-      padding: 24px;
-      margin-bottom: 16px;
-      transition: all 0.3s;
-      animation: fadeIn 0.4s ease;
-    }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    .card:hover { border-color: #4caf50; transform: translateY(-2px); }
-
-    .card-header {
-      display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;
-    }
-    .crop-name { font-size: 22px; font-weight: 700; }
-    .farmer-info { color: #888; font-size: 14px; margin-top: 4px; }
-    .verified-badge {
-      background: #0d2a0d; border: 1px solid #2e7d32;
-      color: #4caf50; font-size: 12px; padding: 4px 12px; border-radius: 20px;
-    }
-
-    .price-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;
-    }
-    .price-box { border-radius: 12px; padding: 14px; text-align: center; }
-    .price-box.green { background: rgba(76,175,80,0.1); border: 1px solid #2e7d32; }
-    .price-box.red { background: rgba(244,67,54,0.1); border: 1px solid #4a1a1a; }
-    .price-box.gold { background: rgba(255,193,7,0.1); border: 1px solid #5a4a00; }
-    .price-box .amount { font-size: 20px; font-weight: 700; }
-    .price-box.green .amount { color: #4caf50; }
-    .price-box.red .amount { color: #f44336; }
-    .price-box.gold .amount { color: #ffc107; }
-    .price-box .label { font-size: 11px; color: #888; margin-top: 4px; }
-
-    .card-footer { display: flex; gap: 10px; }
-    .btn-primary {
-      flex: 1; padding: 12px; background: linear-gradient(135deg, #2e7d32, #4caf50);
-      color: white; border: none; border-radius: 10px; font-size: 14px;
-      font-weight: 600; cursor: pointer; transition: all 0.2s;
-    }
-    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn-secondary {
-      padding: 12px 20px; background: transparent; border: 1px solid #2e7d32;
-      color: #4caf50; border-radius: 10px; font-size: 14px; cursor: pointer;
-    }
-
-    .toast {
-      position: fixed; bottom: 30px; right: 30px;
-      background: #1b5e20; color: white; padding: 14px 24px;
-      border-radius: 12px; font-size: 14px; font-weight: 600;
-      display: none; animation: slideIn 0.3s ease; z-index: 999;
-    }
-    @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#050a05;color:#e8f5e9;font-family:'Space Grotesk',sans-serif;min-height:100vh}
+    nav{display:flex;justify-content:space-between;align-items:center;padding:16px 32px;background:rgba(0,0,0,.7);border-bottom:1px solid #1a3a1a;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+    .logo{font-size:22px;font-weight:700;color:#4caf50}.logo span{color:#fff}
+    nav a{color:#aaa;text-decoration:none;margin-left:24px;font-size:14px;transition:color .2s}
+    nav a:hover,nav a.active{color:#4caf50}
+    .hero{text-align:center;padding:50px 20px 30px}
+    .hero h1{font-size:42px;font-weight:700;background:linear-gradient(135deg,#4caf50,#8bc34a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .hero p{color:#888;margin-top:8px}
+    .banner{background:linear-gradient(135deg,#1b5e20,#2e7d32);margin:0 20px 30px;border-radius:16px;padding:20px 24px;display:flex;justify-content:space-around;text-align:center;flex-wrap:wrap;gap:12px}
+    .banner-stat .value{font-size:28px;font-weight:700;color:#a5d6a7}
+    .banner-stat .label{font-size:12px;color:#81c784;margin-top:4px}
+    .container{max-width:900px;margin:0 auto;padding:0 20px 40px}
+    .search-bar{width:100%;padding:13px 18px;background:#0d1f0d;border:1px solid #2e7d32;border-radius:12px;color:#e8f5e9;font-size:14px;font-family:'Space Grotesk',sans-serif;margin-bottom:16px;outline:none;transition:border-color .2s}
+    .search-bar::placeholder{color:#555}
+    .search-bar:focus{border-color:#4caf50}
+    .filter-bar{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+    .filter-btn{padding:8px 20px;border-radius:20px;border:1px solid #2e7d32;background:transparent;color:#4caf50;cursor:pointer;font-size:13px;transition:all .2s;font-family:'Space Grotesk',sans-serif}
+    .filter-btn.active,.filter-btn:hover{background:#2e7d32;color:#fff}
+    .card{background:#0d1f0d;border:1px solid #1e4a1e;border-radius:20px;padding:24px;margin-bottom:16px;transition:all .3s;animation:fadeIn .4s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .card:hover{border-color:#4caf50;transform:translateY(-2px)}
+    .card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+    .crop-name{font-size:22px;font-weight:700}
+    .farmer-info{color:#888;font-size:13px;margin-top:4px}
+    .verified-badge{background:#0d2a0d;border:1px solid #2e7d32;color:#4caf50;font-size:12px;padding:4px 12px;border-radius:20px;white-space:nowrap}
+    .price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+    .price-box{border-radius:12px;padding:14px;text-align:center}
+    .price-box.green{background:rgba(76,175,80,.1);border:1px solid #2e7d32}
+    .price-box.red{background:rgba(244,67,54,.1);border:1px solid #4a1a1a}
+    .price-box.gold{background:rgba(255,193,7,.1);border:1px solid #5a4a00}
+    .price-box .amount{font-size:20px;font-weight:700}
+    .price-box.green .amount{color:#4caf50}
+    .price-box.red .amount{color:#f44336}
+    .price-box.gold .amount{color:#ffc107}
+    .price-box .label{font-size:11px;color:#888;margin-top:4px}
+    .savings-pct{font-size:10px;color:#a5d6a7;margin-top:2px}
+    .card-footer{display:flex;gap:10px}
+    .btn-primary{flex:1;padding:12px;background:linear-gradient(135deg,#2e7d32,#4caf50);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Space Grotesk',sans-serif}
+    .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+    .btn-secondary{padding:12px 20px;background:transparent;border:1px solid #2e7d32;color:#4caf50;border-radius:10px;font-size:14px;cursor:pointer;transition:all .2s;font-family:'Space Grotesk',sans-serif}
+    .btn-secondary:hover{background:#0d2a0d}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:#0d1f0d;border:1px solid #2e7d32;border-radius:20px;padding:32px;max-width:480px;width:90%;animation:fadeIn .3s ease;max-height:90vh;overflow-y:auto}
+    .modal h2{font-size:22px;color:#4caf50;margin-bottom:6px}
+    .modal-sub{color:#888;font-size:13px;margin-bottom:20px}
+    .modal-detail{background:#0a150a;border:1px solid #1e3a1e;border-radius:12px;padding:16px;margin-bottom:16px}
+    .modal-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #1a2a1a;font-size:14px}
+    .modal-row:last-child{border-bottom:none}
+    .modal-row span:last-child{color:#4caf50;font-weight:600;text-align:right;max-width:60%}
+    .modal-close{width:100%;padding:12px;background:transparent;border:1px solid #2e7d32;color:#4caf50;border-radius:10px;cursor:pointer;font-size:14px;font-family:'Space Grotesk',sans-serif;margin-top:8px}
+    .modal-close:hover{background:#0d2a0d}
+    .toast{position:fixed;bottom:30px;right:30px;background:#1b5e20;color:#fff;padding:14px 24px;border-radius:12px;font-size:14px;font-weight:600;display:none;z-index:999;animation:slideIn .3s ease}
+    @keyframes slideIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
+    .empty-state{text-align:center;padding:60px 20px;color:#555}
+    .empty-state .icon{font-size:48px;margin-bottom:12px}
+    .loading-state{text-align:center;padding:60px 20px;color:#4caf50}
+    .spinner-sm{width:36px;height:36px;border:3px solid #1a3a1a;border-top:3px solid #4caf50;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:600px){.price-grid{grid-template-columns:1fr 1fr}.banner{flex-direction:column;align-items:center}}
   </style>
 </head>
 <body>
-
 <nav>
   <div class="logo">Byte<span>Greens</span></div>
   <div>
@@ -113,95 +78,156 @@
     <a href="dashboard.html">📊 Dashboard</a>
   </div>
 </nav>
-
 <div class="hero">
   <h1>Smart Market</h1>
   <p>Direct farmer-to-buyer. Zero middlemen. Blockchain verified.</p>
 </div>
-
 <div class="banner">
-  <div class="banner-stat"><div class="value">₹42L+</div><div class="label">Saved for Farmers</div></div>
-  <div class="banner-stat"><div class="value">1,247</div><div class="label">Active Farmers</div></div>
+  <div class="banner-stat"><div class="value" id="bSaved">₹42L+</div><div class="label">Saved for Farmers</div></div>
+  <div class="banner-stat"><div class="value" id="bFarmers">1,247</div><div class="label">Active Farmers</div></div>
   <div class="banner-stat"><div class="value">94%</div><div class="label">Price Transparency</div></div>
   <div class="banner-stat"><div class="value">⛓ 100%</div><div class="label">Blockchain Verified</div></div>
 </div>
-
 <div class="container">
-  <div class="filter-bar">
-    <button class="filter-btn active" onclick="filterCrops('all', this)">All Crops</button>
-    <button class="filter-btn" onclick="filterCrops('Tomatoes', this)">Tomatoes</button>
-    <button class="filter-btn" onclick="filterCrops('Rice', this)">Rice</button>
-    <button class="filter-btn" onclick="filterCrops('Maize', this)">Maize</button>
-    <button class="filter-btn" onclick="filterCrops('Ragi', this)">Ragi</button>
+  <input type="text" class="search-bar" id="searchBar" placeholder="🔍  Search crops, farmers, or locations..." oninput="applyFilters()">
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" onclick="setFilter('all',this)">All Crops</button>
   </div>
-
-  <div id="listings"></div>
+  <div id="listings"><div class="loading-state"><div class="spinner-sm"></div><p>Loading market data...</p></div></div>
 </div>
-
-<div class="toast" id="toast">✅ Request sent to farmer!</div>
-
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalContent"></div>
+</div>
+<div class="toast" id="toast">✅ Request sent! Farmer will contact you within 24 hours.</div>
 <script>
-  let allListings = [];
+const API = 'http://localhost:8000';
+let allListings = [];
+let activeFilter = 'all';
 
-  async function loadMarket() {
-    try {
-      const res = await fetch('http://localhost:8000/market');
-      const data = await res.json();
-      allListings = data.listings;
-      renderListings(allListings);
-    } catch(e) {
-      document.getElementById('listings').innerHTML = '<p style="text-align:center;color:#888;padding:40px">Could not load market data. Is the backend running?</p>';
-    }
+// Fallback data if backend is offline
+const FALLBACK = [
+  {id:1,crop:'Tomatoes',farmer:'Raju K.',location:'Mandya',quantity:'500 kg',bytegreens_price:18,middleman_price:11,farmer_extra_earning:3500,quality:'Grade A',harvest_date:'2026-05-24',blockchain_verified:true},
+  {id:2,crop:'Rice (Sona Masuri)',farmer:'Venkatesh M.',location:'Mysuru',quantity:'2000 kg',bytegreens_price:22,middleman_price:14,farmer_extra_earning:16000,quality:'Grade A',harvest_date:'2026-05-26',blockchain_verified:true},
+  {id:3,crop:'Maize',farmer:'Lakshmi D.',location:'Hassan',quantity:'800 kg',bytegreens_price:15,middleman_price:9,farmer_extra_earning:4800,quality:'Grade B+',harvest_date:'2026-05-23',blockchain_verified:true},
+  {id:4,crop:'Ragi',farmer:'Shivanna P.',location:'Tumkur',quantity:'1200 kg',bytegreens_price:35,middleman_price:22,farmer_extra_earning:15600,quality:'Grade A',harvest_date:'2026-05-25',blockchain_verified:true},
+  {id:5,crop:'Banana (Nendran)',farmer:'Mohan Raj',location:'Mandya',quantity:'1.2 tonnes',bytegreens_price:35,middleman_price:22,farmer_extra_earning:15600,quality:'Grade A+',harvest_date:'2026-05-23',blockchain_verified:true},
+  {id:6,crop:'Tomato (Cherry)',farmer:'Anitha S.',location:'Ramanagara',quantity:'200 kg',bytegreens_price:65,middleman_price:40,farmer_extra_earning:5000,quality:'Premium Organic',harvest_date:'2026-05-22',blockchain_verified:true},
+];
+
+async function loadMarket(){
+  try {
+    const res = await fetch(API+'/market');
+    const data = await res.json();
+    allListings = data.listings || FALLBACK;
+  } catch(e) {
+    allListings = FALLBACK;
   }
+  buildFilters();
+  applyFilters();
+  loadStats();
+}
 
-  function renderListings(listings) {
-    const container = document.getElementById('listings');
-    container.innerHTML = listings.map(item => `
-      <div class="card" data-crop="${item.crop}">
-        <div class="card-header">
-          <div>
-            <div class="crop-name">${item.crop}</div>
-            <div class="farmer-info">👨‍🌾 ${item.farmer} · 📍 ${item.location} · 📦 ${item.quantity}</div>
-          </div>
-          ${item.blockchain_verified ? '<span class="verified-badge">⛓ Verified</span>' : ''}
+async function loadStats(){
+  try {
+    const res = await fetch(API+'/stats');
+    const s = await res.json();
+    if(s.income_saved_lakhs) document.getElementById('bSaved').textContent = '₹'+s.income_saved_lakhs+'L+';
+    if(s.farmers_helped) document.getElementById('bFarmers').textContent = s.farmers_helped.toLocaleString();
+  } catch(e){}
+}
+
+function buildFilters(){
+  const crops = [...new Set(allListings.map(l => l.crop.split(' ')[0]))];
+  const bar = document.getElementById('filterBar');
+  bar.innerHTML = `<button class="filter-btn active" onclick="setFilter('all',this)">All Crops</button>`;
+  crops.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.textContent = c;
+    btn.onclick = function(){ setFilter(c, this); };
+    bar.appendChild(btn);
+  });
+}
+
+function setFilter(f, btn){
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function applyFilters(){
+  const q = document.getElementById('searchBar').value.toLowerCase();
+  let filtered = allListings;
+  if(activeFilter !== 'all') filtered = filtered.filter(l=>l.crop.toLowerCase().includes(activeFilter.toLowerCase()));
+  if(q) filtered = filtered.filter(l=>l.crop.toLowerCase().includes(q)||l.farmer.toLowerCase().includes(q)||l.location.toLowerCase().includes(q));
+  renderListings(filtered);
+}
+
+function renderListings(items){
+  const c = document.getElementById('listings');
+  if(!items.length){
+    c.innerHTML = '<div class="empty-state"><div class="icon">🌾</div><p>No listings found.</p></div>';
+    return;
+  }
+  c.innerHTML = items.map(item => {
+    const savings = Math.round(((item.bytegreens_price - item.middleman_price)/item.middleman_price)*100);
+    return `<div class="card">
+      <div class="card-header">
+        <div>
+          <div class="crop-name">${item.crop}</div>
+          <div class="farmer-info">👨‍🌾 ${item.farmer} &nbsp;·&nbsp; 📍 ${item.location} &nbsp;·&nbsp; 📦 ${item.quantity} &nbsp;·&nbsp; 🏷 ${item.quality||''}</div>
         </div>
-        <div class="price-grid">
-          <div class="price-box green">
-            <div class="amount">₹${item.bytegreens_price}/kg</div>
-            <div class="label">ByteGreens Price</div>
-          </div>
-          <div class="price-box red">
-            <div class="amount">₹${item.middleman_price}/kg</div>
-            <div class="label">Middleman Price</div>
-          </div>
-          <div class="price-box gold">
-            <div class="amount">₹${item.farmer_extra_earning.toLocaleString()}</div>
-            <div class="label">Farmer Saves</div>
-          </div>
-        </div>
-        <div class="card-footer">
-          <button class="btn-primary" onclick="connect(${item.id})">Connect with Farmer →</button>
-          <button class="btn-secondary">View Details</button>
-        </div>
+        ${item.blockchain_verified ? '<span class="verified-badge">⛓ Verified</span>' : ''}
       </div>
-    `).join('');
-  }
+      <div class="price-grid">
+        <div class="price-box green"><div class="amount">₹${item.bytegreens_price}/kg</div><div class="label">ByteGreens Price</div><div class="savings-pct">+${savings}% vs mandi</div></div>
+        <div class="price-box red"><div class="amount">₹${item.middleman_price}/kg</div><div class="label">Middleman Price</div></div>
+        <div class="price-box gold"><div class="amount">₹${(item.farmer_extra_earning||0).toLocaleString()}</div><div class="label">Farmer Earns Extra</div></div>
+      </div>
+      <div class="card-footer">
+        <button class="btn-primary" onclick="connect(${item.id})">Connect with Farmer →</button>
+        <button class="btn-secondary" onclick="showDetails(${item.id})">Details</button>
+      </div>
+    </div>`;
+  }).join('');
+}
 
-  function filterCrops(crop, btn) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    if (crop === 'all') renderListings(allListings);
-    else renderListings(allListings.filter(l => l.crop.includes(crop)));
-  }
+function showDetails(id){
+  const item = allListings.find(l=>l.id===id);
+  if(!item) return;
+  const savings = Math.round(((item.bytegreens_price - item.middleman_price)/item.middleman_price)*100);
+  document.getElementById('modalContent').innerHTML = `
+    <h2>${item.crop}</h2>
+    <div class="modal-sub">Full listing details from ${item.farmer}, ${item.location}</div>
+    <div class="modal-detail">
+      <div class="modal-row"><span>Farmer</span><span>${item.farmer}</span></div>
+      <div class="modal-row"><span>Location</span><span>📍 ${item.location}</span></div>
+      <div class="modal-row"><span>Available Quantity</span><span>${item.quantity}</span></div>
+      <div class="modal-row"><span>Quality Grade</span><span>${item.quality||'—'}</span></div>
+      <div class="modal-row"><span>Harvest Date</span><span>${item.harvest_date||'—'}</span></div>
+      <div class="modal-row"><span>ByteGreens Price</span><span>₹${item.bytegreens_price}/kg</span></div>
+      <div class="modal-row"><span>Middleman Price</span><span>₹${item.middleman_price}/kg</span></div>
+      <div class="modal-row"><span>Farmer Earns Extra</span><span>₹${(item.farmer_extra_earning||0).toLocaleString()}</span></div>
+      <div class="modal-row"><span>Price Advantage</span><span>+${savings}% better than mandi</span></div>
+      <div class="modal-row"><span>Blockchain Verified</span><span>${item.blockchain_verified?'✅ Yes':'❌ No'}</span></div>
+    </div>
+    <button class="btn-primary" style="width:100%;margin-bottom:10px" onclick="connect(${item.id});closeModalDirect()">Connect with Farmer →</button>
+    <button class="modal-close" onclick="closeModalDirect()">Close</button>
+  `;
+  document.getElementById('modalOverlay').classList.add('open');
+}
 
-  function connect(id) {
-    const toast = document.getElementById('toast');
-    toast.style.display = 'block';
-    setTimeout(() => toast.style.display = 'none', 3000);
-  }
+function closeModal(e){ if(e.target===document.getElementById('modalOverlay')) closeModalDirect(); }
+function closeModalDirect(){ document.getElementById('modalOverlay').classList.remove('open'); }
 
-  loadMarket();
+function connect(id){
+  const t = document.getElementById('toast');
+  t.style.display = 'block';
+  setTimeout(()=>t.style.display='none', 3500);
+}
+
+loadMarket();
 </script>
-
 </body>
 </html>
